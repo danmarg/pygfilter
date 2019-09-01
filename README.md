@@ -29,3 +29,6 @@ Parsed 3 rules.
 
 Note that unless explicitly specified (`--nooverwrite`), gfilter *will*
 *overwrite* existing filters!
+
+You will have to register your OAuth application and get a `token.json` file as
+documented [here](https://github.com/google/mail-importer).
