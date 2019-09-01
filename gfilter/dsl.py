@@ -61,6 +61,11 @@ class DeliveredTo(Has):
     def __init__(self, deliveredto: str):
         super().__init__('deliveredto:' + deliveredto)
 
+class Is(Has):
+    '''Matches all mail with a given "is" type.'''
+    def __init__(self, isstr: str):
+        super().__init__('is:' + isstsr)
+
 class HasAttachment(Has):
     '''Matches all mail with an attachment.'''
     def __init__(self):
