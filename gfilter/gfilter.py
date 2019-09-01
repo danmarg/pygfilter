@@ -1,8 +1,6 @@
-#!/usr/bin/python3
-
 from __future__ import print_function
 import argparse
-import importlib
+import importlib.machinery
 import json
 import os.path
 import sys
@@ -129,15 +127,14 @@ def main():
     args = parser.parse_args()
 
     # Exec the input file.
-    if args.rules.endswith('.py'):
-        inputfile = args.rules[:-3]
-    else:
-        inputfile = args.rules
-    globals().update(importlib.import_module(inputfile).__dict__)
+    spec = importlib.util.spec_from_file_location(
+            'imported_rules', args.rules)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
     # Print expected rules.
-    print('Parsed %d rules.' % len(dsl.RULES))
+    print('Parsed %d rules.' % len(gfilter.dsl.RULES))
     if args.print:
-        for rule in dsl.RULES:
+        for rule in gfilter.dsl.RULES:
             print(rule)
     if args.upload:
         gmail = Gmail()
