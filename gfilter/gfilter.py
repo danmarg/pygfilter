@@ -142,7 +142,7 @@ def main():
         gmail.get_labels()
         if not args.nooverwrite:
             gmail.delete_all_()
-        gmail.upload(dsl.RULES)
+        gmail.upload(gfilter.dsl.RULES)
 
 if __name__ == '__main__':
     main(sys.argv[1:])
