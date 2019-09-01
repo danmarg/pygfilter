@@ -22,10 +22,12 @@ class Gmail:
     __filters = None  # Cache of existing filter IDs.
     __labels = None   # Cache of existing labels. A dict of label -> id.
 
-    def login(self):
+    def login(self, credentials, token, access_token=None):
         creds = None
-        if os.path.exists('token.json'):
-            with open('token.json', 'r') as token:
+        if access_token:
+            creds = Credentials(access_token)
+        elif os.path.exists(token):
+            with open(token, 'r') as token:
                 raw = json.load(token)
                 creds = Credentials(
                         token=raw['token'],
@@ -39,10 +41,10 @@ class Gmail:
                 creds.refresh(Request())
             else:
                 flow = InstalledAppFlow.from_client_secrets_file(
-                    'credentials.json', SCOPES)
+                    credentials, SCOPES)
                 creds = flow.run_local_server()
             # Save the credentials for the next run
-            with open('token.json', 'w') as token:
+            with open(token, 'w') as token:
                 raw = {'token': creds.token,
                        'refresh_token': creds.refresh_token,
                        'token_uri': creds.token_uri,
@@ -124,6 +126,16 @@ def main():
     parser.add_argument(
             '-n', '--nooverwrite', help='Don\'t overwrite existing rules',
             action='store_true')
+    parser.add_argument(
+            '--creds', help='Path to credentials JSON file',
+            default='credentials.json')
+    parser.add_argument(
+            '--token', help='Path to token JSON file',
+            default='token.json')
+    parser.add_argument(
+            '--access_token', help='Access token.',
+            default=None)
+
     args = parser.parse_args()
 
     # Exec the input file.
@@ -138,7 +150,8 @@ def main():
             print(rule)
     if args.upload:
         gmail = Gmail()
-        gmail.login()
+        gmail.login(credentials=args.creds, token=args.token,
+                    access_token=args.access_token)
         gmail.get_labels()
         if not args.nooverwrite:
             gmail.delete_all_()
