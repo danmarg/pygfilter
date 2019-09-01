@@ -29,6 +29,9 @@ Parsed 3 rules.
 Note that unless explicitly specified (`--nooverwrite`), gfilter *will*
 *overwrite* existing filters!
 
+You will have to register your OAuth application and get a `token.json` file as
+documented [here](https://github.com/google/mail-importer).
+
 # Language Reference
 
 The GFilter eDSL consists of rules comprised of one or more conditions and a
