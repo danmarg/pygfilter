@@ -18,9 +18,7 @@ lists = {
     }
 
 # Mailing lists
-[List(a) >= L(b) for a, b in lists.items()]
-# Mark them all as 'autocleanup', too.
-[reduce(lambda x, y: x|y, [List(x) for x in lists.keys()]) >= L('autocleanup')]
+[List(a) >= [L(b), L('autocleanup')] for a, b in lists.items()]
 
 $ gfilter personal_filters.py -u
 Parsed 3 rules.
@@ -34,8 +32,8 @@ documented [here](https://github.com/google/mail-importer).
 
 # Language Reference
 
-The GFilter eDSL consists of rules comprised of one or more conditions and a
-single action, joined with the `>=` operator. For example:
+The GFilter eDSL consists of rules comprised of one or more conditions and one 
+or more actions, joined with the `>=` operator. For example:
 ```
 From('spammer@spamdomain.com') >= SkipInbox()
 ```
@@ -64,7 +62,7 @@ Conditions (see [here](https://support.google.com/mail/answer/7190) for more):
 
 Conditions can be combined with the following logical operators:
 
-* `+`: Logical and
+* `&`: Logical and
 * `|`: Logical or
 * `~`: Logical not
 * `Any([list])`: Matches if any of the conditions in the list are true
