@@ -102,16 +102,19 @@ class Gmail:
             remove_labels = [a.remove_label for a in rule.actions
                              if a.remove_label is not None]
 
-            self.__service.users().settings().filters().create(userId='me', body={
-                'criteria': {
-                    'query': rule.cond.query,
-                },
-                'action': {
-                    'addLabelIds': [self.label_to_id(label) for label in add_labels],
-                    'removeLabelIds': [self.label_to_id(label) for label in remove_labels],
-                }
-            }).execute()
+            # Apparently the Gmail API doesn't allow you to create a single
+            # filter that applies two different user labels. I don't know why,
+            # but anyway, we instead do one filter per add/remove label.
+            body = {'criteria': {'query': rule.cond.query}}
 
+            for label in add_labels:
+                b = body.copy()
+                b['action'] = {'addLabelIds': [self.label_to_id(label)]}
+                self.__service.users().settings().filters().create(userId='me', body=b).execute()
+            for label in remove_labels:
+                b = body.copy()
+                b['action'] = {'removeLabelIds': [self.label_to_id(label)]}
+                self.__service.users().settings().filters().create(userId='me', body=b).execute()
 
 def main():
     '''Uploads Gmail .
