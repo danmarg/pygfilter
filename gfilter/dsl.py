@@ -26,52 +26,67 @@ class __Cond__:
         except TypeError:
             return Rule(self, [actions])
 
-class Has(__Cond__):
+class Cond(__Cond__):
     '''Matches all mail matching the given query.'''
-    def __init__(self, has: str):
-        self.query = has
+    def __init__(self, query: str):
+        self.query = query
 
-class List(Has):
+class Has(__Cond__):
+    '''Matches with the 'has' syntax.'''
+    def __init__(self, has: str):
+        super().__init__('has:' + list)
+
+class List(Cond):
     '''Matches all mail to a given list.'''
     def __init__(self, list: str):
         super().__init__('list:' + list)
 
-class To(Has):
+class To(Cond):
     '''Matches all mail To a given address.'''
     def __init__(self, to: str):
         super().__init__('to:' + to)
 
-class Cc(Has):
+class Cc(Cond):
     '''Matches all mail CC'ing a given address.'''
     def __init__(self, cc: str):
         super().__init__('cc:' + cc)
 
-class From(Has):
+class From(Cond):
     '''Matches all mail From a given address.'''
     def __init__(self, frm: str):
         super().__init__('from:' + frm)
 
-class Subject(Has):
+class Subject(Cond):
     '''Matches all mail with a given Subject.'''
     def __init__(self, subject: str):
-        super().__init__('subject:' + subject)
+        super().__init__('subject:(' + subject + ')')
 
-class DeliveredTo(Has):
+class DeliveredTo(Cond):
     '''Matches all mail with a given Delivered-To.'''
     def __init__(self, deliveredto: str):
         super().__init__('deliveredto:' + deliveredto)
 
-class Is(Has):
+class Is(Cond):
     '''Matches all mail with a given "is" type.'''
     def __init__(self, isstr: str):
         super().__init__('is:' + isstsr)
 
-class HasAttachment(Has):
+class HasAttachment(Cond):
     '''Matches all mail with an attachment.'''
     def __init__(self):
         super().__init__('has:attachment')
 
-class Exact(Has):
+class Larger(Cond):
+    '''Matches all mail larger than a given size.'''
+    def __init__(self, size: str):
+        super().__init__('larger:' + size)
+
+class Smaller(Cond):
+    '''Matches all mail smaller than a given size.'''
+    def __init__(self, size: str):
+        super().__init__('smaller:' + size)
+
+class Exact(Cond):
     '''Matches all mail with an exact match.'''
     def __init__(self, exact: str):
         super().__init__('\'' + exact + '\'')

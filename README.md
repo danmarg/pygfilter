@@ -37,11 +37,18 @@ documented [here](https://github.com/google/mail-importer).
 The GFilter eDSL consists of rules comprised of one or more conditions and a
 single action, joined with the `>=` operator. For example:
 ```
-From('spammer@spamdomain.com' >= SkipInbox()
+From('spammer@spamdomain.com') >= SkipInbox()
+```
+
+Actions can also be a list, e.g.:
+
+```
+List('foo@lists.bar.com') >= [SkipInbox(), L('foo')]
 ```
 
 Conditions (see [here](https://support.google.com/mail/answer/7190) for more):
 
+* `Cond`: Raw query (anything that works in Gmail filters)
 * `Has`: Gmail `has:` operator
 * `List`: Gmail `list:` operator
 * `To`: Gmail `to:` operator
@@ -50,6 +57,8 @@ Conditions (see [here](https://support.google.com/mail/answer/7190) for more):
 * `Subject`: Gmail `subject:` operator
 * `DeliveredTo`: Gmail `deliveredto:` operator
 * `HasAttachment`: Equivalent to `has:attachment`
+* `Larger`: Equivalent to `larger:`
+* `Smaller`: Equivalent to `smaller:`
 * `Is`: Gmail `is:` operator
 * `Exact`: Matches mail with exactly this string
 
