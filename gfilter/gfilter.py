@@ -9,6 +9,8 @@ from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
+from os import makedirs
+from os.path import expandvars, dirname
 
 import gfilter.dsl
 
@@ -131,10 +133,10 @@ def main():
             action='store_true')
     parser.add_argument(
             '--creds', help='Path to credentials JSON file',
-            default='credentials.json')
+            default='$HOME/.gfilter/credentials.json')
     parser.add_argument(
             '--token', help='Path to token JSON file',
-            default='token.json')
+            default='$HOME/.gfilter/token.json')
     parser.add_argument(
             '--access_token', help='Access token.',
             default=None)
@@ -152,8 +154,14 @@ def main():
         for rule in gfilter.dsl.RULES:
             print(rule)
     if args.upload:
+        creds = expandvars(args.creds)
+        token = expandvars(args.token)
+        for f in [creds, token]:
+            d = dirname(f)
+            makedirs(d, exist_ok=True)
+
         gmail = Gmail()
-        gmail.login(credentials=args.creds, token=args.token,
+        gmail.login(credentials=creds, token=token,
                     access_token=args.access_token)
         gmail.get_labels()
         if not args.nooverwrite:
