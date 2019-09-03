@@ -134,13 +134,9 @@ class __Action__:
             s += 'REMOVE: ' + self.remove_label
         return s
 
-class Star(__Action__):
-    def __init__(self):
-        super().__init__('STARRED', None)
-
-class SkipInbox(__Action__):
-    def __init__(self):
-        super().__init__(None, 'INBOX')
+# Special labels: add a star or skip the inbox.
+Star = __Action__('STARRED', None)
+SkipInbox = __Action__(None, 'INBOX')
 
 class L(__Action__):
     def __init__(self, label: str):
