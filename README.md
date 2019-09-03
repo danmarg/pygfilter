@@ -70,7 +70,7 @@ Conditions can be combined with the following logical operators:
 
 Actions can be one of the following:
 
-* `Star()`: Add a star
-* `SkipInbox()`: Skip the inbox
+* `Star`: Add a star
+* `SkipInbox`: Skip the inbox
 * `L(label)`: Add `label` as a label
 * `~L(label)`: Remove `label` as a label
