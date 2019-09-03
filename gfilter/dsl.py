@@ -129,9 +129,9 @@ class __Action__:
     def __str__(self):
         s = ''
         if self.add_label:
-            s += 'ADD: ' + self.add_label
+            s += 'L("' + self.add_label + '")'
         if self.remove_label:
-            s += 'REMOVE: ' + self.remove_label
+            s += '~L("' + self.remove_label + '")'
         return s
 
 # Special labels: add a star or skip the inbox.
@@ -157,5 +157,5 @@ class Rule:
         RULES.append(self)
 
     def __str__(self):
-        return '(' + str(self.cond) + ') >= ' + str(
-                [str(a) for a in self.actions])
+        return '(' + str(self.cond) + ') >= ' + '[' + ', '.join(
+                [str(a) for a in self.actions]) + ']'
