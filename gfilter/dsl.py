@@ -9,7 +9,7 @@ class __Cond__:
     query = ''
 
     def __str__(self):
-        return self.query
+        return 'Cond("' + self.query + '")'
 
     # Operator overloading for easy combinations.
     def __invert__(self):
@@ -144,7 +144,7 @@ class L(__Action__):
 
     def __invert__(self):
         '''Invert (~) of a label will remove that label.'''
-        return __Action__(self.remove_labels, self.add_labels)
+        return __Action__(self.remove_label, self.add_label)
 
 ## Rules
 class Rule:
