@@ -149,7 +149,6 @@ def main():
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     # Print expected rules.
-    print('Parsed %d rules.' % len(gfilter.dsl.RULES))
     if args.print:
         for rule in gfilter.dsl.RULES:
             print(rule)
