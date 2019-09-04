@@ -31,10 +31,10 @@ class Cond(__Cond__):
     def __init__(self, query: str):
         self.query = query
 
-class Has(__Cond__):
+class Has(Cond):
     '''Matches with the 'has' syntax.'''
     def __init__(self, has: str):
-        super().__init__('has:' + list)
+        super().__init__('has:' + has)
 
 class List(Cond):
     '''Matches all mail to a given list.'''
