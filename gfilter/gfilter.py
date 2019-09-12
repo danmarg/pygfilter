@@ -24,7 +24,7 @@ class Gmail:
     __filters = None  # Cache of existing filter IDs.
     __labels = None   # Cache of existing labels. A dict of label -> id.
 
-    def login(self, credentials, token, access_token=None):
+    def login(self, credentials, token, access_token=None, developer_key=None):
         creds = None
         if access_token:
             creds = Credentials(access_token)
@@ -54,7 +54,9 @@ class Gmail:
                        'client_secret': creds.client_secret}
                 json.dump(raw, token)
 
-        self.__service = build('gmail', 'v1', credentials=creds)
+        self.__service = build('gmail', 'v1',
+                               credentials=creds,
+                               developerKey=developer_key)
 
     def get_filters(self):
         results = self.__service.users().settings().filters().list(userId='me').execute()
@@ -137,8 +139,12 @@ def main():
     parser.add_argument(
             '--token', help='Path to token JSON file',
             default='$HOME/.gfilter/token.json')
+    # Use the below to bypass the installed-app flow.
     parser.add_argument(
             '--access_token', help='Access token.',
+            default=None)
+    parser.add_argument(
+            '--developer_key', help='Developer key.',
             default=None)
 
     args = parser.parse_args()
@@ -161,7 +167,8 @@ def main():
 
         gmail = Gmail()
         gmail.login(credentials=creds, token=token,
-                    access_token=args.access_token)
+                    access_token=args.access_token,
+                    developer_key=args.developer_key)
         gmail.get_labels()
         if not args.nooverwrite:
             gmail.delete_all_()
