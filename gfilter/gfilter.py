@@ -21,6 +21,7 @@ SCOPES = [
 
 class Gmail:
     __service = None  # Client service stubs.
+    __filters = None  # Cache of existing filter IDs.
     __labels = None   # Cache of existing labels. A dict of label -> id.
 
     def login(self, credentials, token, access_token=None, developer_key=None):
@@ -59,10 +60,11 @@ class Gmail:
 
     def get_filters(self):
         results = self.__service.users().settings().filters().list(userId='me').execute()
-        return results.get('filter', [])
+        self.__filters = results.get('filter', [])
 
-    def delete_filters(self, filters):
-        for f in filters:
+    def delete_all_(self):
+        self.get_filters()
+        for f in self.__filters:
             self.__service.users().settings().filters().delete(
                     userId='me', id=f['id']).execute()
 
@@ -168,12 +170,9 @@ def main():
                     access_token=args.access_token,
                     developer_key=args.developer_key)
         gmail.get_labels()
-        # Cache the old filters here.
-        to_delete = None if args.nooverwrite else gmail.get_filters()
+        if not args.nooverwrite:
+            gmail.delete_all_()
         gmail.upload(gfilter.dsl.RULES)
-        # Delete the old filters.
-        if to_delete:
-            gmail.delete_filters(to_delete)
 
 if __name__ == '__main__':
     main(sys.argv[1:])
