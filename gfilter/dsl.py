@@ -134,9 +134,10 @@ class __Action__:
             s += '~L("' + self.remove_label + '")'
         return s
 
-# Special labels: add a star or skip the inbox.
+# Special labels: add a star, skip the inbox, or trash.
 Star = __Action__('STARRED', None)
 SkipInbox = __Action__(None, 'INBOX')
+Trash = __Action__('TRASH', None)
 
 class L(__Action__):
     def __init__(self, label: str):
