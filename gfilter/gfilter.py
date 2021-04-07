@@ -6,11 +6,14 @@ import os.path
 import sys
 
 from googleapiclient.discovery import build
+from googleapiclient.errors import HttpError
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from os import makedirs
 from os.path import expandvars, dirname
+
+from retry import retry
 
 import gfilter.dsl
 
@@ -23,6 +26,12 @@ class Gmail:
     __service = None  # Client service stubs.
     __filters = None  # Cache of existing filter IDs.
     __labels = None   # Cache of existing labels. A dict of label -> id.
+
+
+    # Retry in case we have exhausted quota.
+    @retry(HttpError, tries=3, delay=2)
+    def __execute(self, x):
+        return x.execute()
 
     def login(self, credentials, token, access_token=None, developer_key=None):
         creds = None
@@ -59,17 +68,17 @@ class Gmail:
                                developerKey=developer_key)
 
     def get_filters(self):
-        results = self.__service.users().settings().filters().list(userId='me').execute()
+        results = self.__execute(self.__service.users().settings().filters().list(userId='me'))
         self.__filters = results.get('filter', [])
 
     def delete_all_(self):
         self.get_filters()
         for f in self.__filters:
-            self.__service.users().settings().filters().delete(
-                    userId='me', id=f['id']).execute()
+            self.__execute(self.__service.users().settings().filters().delete(
+                    userId='me', id=f['id']))
 
     def get_labels(self):
-        response = self.__service.users().labels().list(userId='me').execute()
+        response = self.__execute(self.__service.users().labels().list(userId='me'))
         labels = response['labels']
         self.__labels = {
                 # Magic labels:
@@ -89,8 +98,8 @@ class Gmail:
             self.__labels[label['name']] = label['id']
 
     def create_label(self, label):  # TODO: label/message list visibility?
-        result = self.__service.users().labels().create(userId='me',
-                body={ 'name': label }).execute()
+        result = self.__execute(self.__service.users().labels().create(userId='me',
+                body={ 'name': label }))
         return result['id']
 
     def label_to_id(self, label):
@@ -100,6 +109,8 @@ class Gmail:
         return self.__labels[label]
 
     def upload(self, rules):  # TODO: type annotations
+
+
         for rule in rules:
             add_labels = [a.add_label for a in rule.actions
                           if a.add_label is not None]
@@ -114,11 +125,11 @@ class Gmail:
             for label in add_labels:
                 b = body.copy()
                 b['action'] = {'addLabelIds': [self.label_to_id(label)]}
-                self.__service.users().settings().filters().create(userId='me', body=b).execute()
+                self.__execute(self.__service.users().settings().filters().create(userId='me', body=b))
             for label in remove_labels:
                 b = body.copy()
                 b['action'] = {'removeLabelIds': [self.label_to_id(label)]}
-                self.__service.users().settings().filters().create(userId='me', body=b).execute()
+                self.__execute(self.__service.users().settings().filters().create(userId='me', body=b))
 
 def main():
     '''Uploads Gmail .
